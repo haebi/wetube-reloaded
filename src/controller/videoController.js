@@ -52,16 +52,17 @@ export const postUpload = async (req, res) => {
   // console.log(dbVideo);
 
   // save() 대신 create 를 사용하는 방법
-  await Video.create({
-    title: title,
-    description: description,
-    createdAt: Date.now(),
-    hashtags: hashtags.split(",").map((word) => `#${word}`),
-    meta: {
-      views: 0,
-      rating: 0,
-    },
-  });
-  
-  return res.redirect("/");
+  try {
+    await Video.create({
+      title: title,
+      description: description,
+      hashtags: hashtags.split(",").map((word) => `#${word}`),
+    });
+    return res.redirect("/");
+  } catch (error) {
+    return res.render("upload", { 
+      pageTitle: "Upload Video",
+      errorMessage: error._message, 
+    });
+  }
 };
