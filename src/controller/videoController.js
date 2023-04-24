@@ -7,6 +7,7 @@ import Video from "../models/Video";
 // };
 
 // Mongoose 6.0 버전 이상에서는 Model.find() 함수가 더 이상 콜백 함수를 지원하지 않습니다. 대신에 Model.find()는 Promise를 반환하도록 변경되었습니다.
+// nico 강의 버전으로 다시 수정...
 export const home = async (req, res) => {
     const videos = await Video.find({});
     return res.render("home", { pageTitle: "Home", videos });
