@@ -55,28 +55,11 @@ export const getUpload = (req, res) => {
 
 export const postUpload = async (req, res) => {
   const { title, description, hashtags } = req.body;
-  // const video = new Video({
-  //   title: title,
-  //   description: description,
-  //   createdAt: Date.now(),
-  //   hashtags: hashtags.split(",").map((word) => `#${word}`),
-  //   meta: {
-  //     views: 0,
-  //     rating: 0,
-  //   },
-  // });
-
-  // const dbVideo = video.save();
-  // console.log(dbVideo);
-
-  // save() 대신 create 를 사용하는 방법
   try {
     await Video.create({
       title: title,
       description: description,
-      hashtags: hashtags
-        .split(",")
-        .map((word) => (word.srartsWith("#") ? word : `#${word}`)),
+      hashtags: hashtags,
     });
     return res.redirect("/");
   } catch (error) {
