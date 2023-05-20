@@ -1,31 +1,19 @@
 import Video from "../models/Video";
 import User from "../models/User";
-
-// export const home = (req, res) => {
-//   Video.find({}, (error, videos) => {
-//     return res.render("home", { pageTitle: "Home", videos });
-//   });
-// };
-
-// Mongoose 6.0 버전 이상에서는 Model.find() 함수가 더 이상 콜백 함수를 지원하지 않습니다. 대신에 Model.find()는 Promise를 반환하도록 변경되었습니다.
-// nico 강의 버전으로 다시 수정...
 export const home = async (req, res) => {
   const videos = await Video.find({})
     .sort({ createdAt: "desc" })
     .populate("owner");
   return res.render("home", { pageTitle: "Home", videos });
 };
-
 export const watch = async (req, res) => {
   const { id } = req.params;
   const video = await Video.findById(id).populate("owner");
-
   if (!video) {
     return res.render("404", { pageTitle: "Video not found." });
   }
   return res.render("watch", { pageTitle: video.title, video });
 };
-
 export const getEdit = async (req, res) => {
   const { id } = req.params;
   const {
@@ -38,9 +26,8 @@ export const getEdit = async (req, res) => {
   if (String(video.owner) !== String(_id)) {
     return res.status(403).redirect("/");
   }
-  return res.render("edit", { pageTitle: `Edit:, ${video.title}`, video });
+  return res.render("edit", { pageTitle: `Edit: ${video.title}`, video });
 };
-
 export const postEdit = async (req, res) => {
   const {
     user: { _id },
@@ -61,11 +48,9 @@ export const postEdit = async (req, res) => {
   });
   return res.redirect(`/videos/${id}`);
 };
-
 export const getUpload = (req, res) => {
-  return res.render("upload", { pageTitle: "Upload" });
+  return res.render("upload", { pageTitle: "Upload Video" });
 };
-
 export const postUpload = async (req, res) => {
   const {
     user: { _id },
@@ -74,8 +59,8 @@ export const postUpload = async (req, res) => {
   const { title, description, hashtags } = req.body;
   try {
     const newVideo = await Video.create({
-      title: title,
-      description: description,
+      title,
+      description,
       fileUrl,
       owner: _id,
       hashtags: Video.formatHashtags(hashtags),
@@ -92,7 +77,6 @@ export const postUpload = async (req, res) => {
     });
   }
 };
-
 export const deleteVideo = async (req, res) => {
   const { id } = req.params;
   const {
@@ -108,7 +92,6 @@ export const deleteVideo = async (req, res) => {
   await Video.findByIdAndDelete(id);
   return res.redirect("/");
 };
-
 export const search = async (req, res) => {
   const { keyword } = req.query;
   let videos = [];
@@ -120,4 +103,15 @@ export const search = async (req, res) => {
     }).populate("owner");
   }
   return res.render("search", { pageTitle: "Search", videos });
+};
+
+export const registerView = async (req, res) => {
+  const { id } = req.params;
+  const video = await Video.findById(id);
+  if (!video) {
+    return res.status(404);
+  }
+  video.meta.views = video.meta.views + 1;
+  await video.save();
+  return res.status(200);
 };
